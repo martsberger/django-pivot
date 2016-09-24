@@ -49,3 +49,10 @@ class Tests(TestCase):
             region = row['region']
             for dt in dates:
                 self.assertEqual(row[dt], sum(ss.units for ss in shirt_sales if ss.region == region and unicode(ss.shipped) == dt))
+
+        pt = pivot(ShirtSales.objects, 'shipped', 'style', 'units')
+
+        for row in pt:
+            shipped = row['shipped']
+            for style in styles:
+                self.assertEqual(row[style], sum(ss.units for ss in shirt_sales if unicode(ss.shipped) == unicode(shipped) and ss.style == style))
