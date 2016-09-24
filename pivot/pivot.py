@@ -6,7 +6,7 @@ def pivot(queryset, row, column, data, aggregation=Sum):
     """
     Takes a queryset and pivots it. The result is a table with one record
     per unique value in the row column, a column for each unique value in the column column
-    and values in the table aggregated by data.
+    and values in the table aggregated by the data column.
 
     :param queryset:
     :param row:
@@ -19,7 +19,7 @@ def pivot(queryset, row, column, data, aggregation=Sum):
     columns = _get_column_choices(queryset, column).order_by(column)
 
     annotations = {
-        c: aggregation(Case(When(Q(**{column: c}), then=F(data))))
+        unicode(c): aggregation(Case(When(Q(**{column: c}), then=F(data))))
         for c in columns
     }
 
