@@ -4,6 +4,17 @@ from models import ShirtSales, Store, Region
 from pivot import pivot
 
 
+genders = ['Boy', 'Girl']
+styles = ['Tee', 'Golf', 'Fancy']
+dates = ['2005-01-31',
+         '2005-02-01',
+         '2005-02-02',
+         '2005-03-01',
+         '2005-03-02',
+         '2005-04-03',
+         '2005-05-06']
+
+
 class Tests(TestCase):
 
     @classmethod
@@ -23,15 +34,6 @@ class Tests(TestCase):
         Store(name='Shirts R Us', region=regions[3]).save()
         Store(name='Shirts N More', region=regions[0]).save()
 
-        genders = ['Boy', 'Girl']
-        styles = ['Tee', 'Golf', 'Fancy']
-        dates = ['2005-01-31',
-                 '2005-02-01',
-                 '2005-02-02',
-                 '2005-03-01',
-                 '2005-03-02',
-                 '2005-04-03',
-                 '2005-05-06']
         units = [12, 10, 11, 15, 13, 9, 17, 3, 7]
         prices = [11.04, 13.00, 11.96, 11.27, 12.12, 13.74, 11.44, 12.63, 12.06, 13.42, 11.48]
 
@@ -51,15 +53,6 @@ class Tests(TestCase):
         ShirtSales.objects.bulk_create(shirt_sales)
 
     def test_pivot(self):
-        genders = ['Boy', 'Girl']
-        styles = ['Tee', 'Golf', 'Fancy']
-        dates = ['2005-01-31',
-                 '2005-02-01',
-                 '2005-02-02',
-                 '2005-03-01',
-                 '2005-03-02',
-                 '2005-04-03',
-                 '2005-05-06']
         shirt_sales = ShirtSales.objects.all()
 
         pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units')
@@ -68,6 +61,9 @@ class Tests(TestCase):
             style = row['style']
             for gender in genders:
                 self.assertEqual(row[gender], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
+
+    def test_pivot_on_date(self):
+        shirt_sales = ShirtSales.objects.all()
 
         pt = pivot(ShirtSales, 'style', 'shipped', 'units')
 
@@ -82,6 +78,9 @@ class Tests(TestCase):
             shipped = row['shipped']
             for style in styles:
                 self.assertEqual(row[style], sum(ss.units for ss in shirt_sales if unicode(ss.shipped) == unicode(shipped) and ss.style == style))
+
+    def test_pivot_on_foreignkey(self):
+        shirt_sales = ShirtSales.objects.all()
 
         pt = pivot(ShirtSales, 'shipped', 'store__region__name', 'units')
 
