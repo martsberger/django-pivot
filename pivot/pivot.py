@@ -1,4 +1,4 @@
-from django.db.models import Case, When, Q, F, Sum
+from django.db.models import Case, When, Q, F, Sum, ForeignKey
 from django.shortcuts import _get_queryset
 
 
@@ -16,15 +16,19 @@ def pivot(queryset, row, column, data, aggregation=Sum):
     """
     queryset = _get_queryset(queryset)
 
-    columns = _get_column_choices(queryset, column).order_by(column)
+    column_values = _get_column_values(queryset, column).order_by(column)
 
-    annotations = {
-        unicode(c): aggregation(Case(When(Q(**{column: c}), then=F(data))))
-        for c in columns
-    }
+    annotations = _get_annotations(column, column_values, data, aggregation)
 
     return queryset.values(row).annotate(**annotations)
 
 
-def _get_column_choices(queryset, column):
+def _get_column_values(queryset, column):
     return queryset.values_list(column, flat=True).distinct()
+
+
+def _get_annotations(column, column_values, data, aggregation):
+    return {
+        unicode(c): aggregation(Case(When(Q(**{column: c}), then=F(data))))
+        for c in column_values
+    }
