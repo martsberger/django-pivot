@@ -6,8 +6,10 @@ from pivot import pivot
 
 class Tests(TestCase):
 
-    def test_pivot(self):
-        # Generate a bunch of data and pivot it
+    @classmethod
+    def setUpClass(cls):
+        super(Tests, cls).setUpClass()
+        # Generate a bunch of data to pivot
         Region(name='North').save()
         Region(name='South').save()
         Region(name='East').save()
@@ -48,6 +50,18 @@ class Tests(TestCase):
 
         ShirtSales.objects.bulk_create(shirt_sales)
 
+    def test_pivot(self):
+        genders = ['Boy', 'Girl']
+        styles = ['Tee', 'Golf', 'Fancy']
+        dates = ['2005-01-31',
+                 '2005-02-01',
+                 '2005-02-02',
+                 '2005-03-01',
+                 '2005-03-02',
+                 '2005-04-03',
+                 '2005-05-06']
+        shirt_sales = ShirtSales.objects.all()
+
         pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units')
 
         for row in pt:
@@ -72,7 +86,6 @@ class Tests(TestCase):
         pt = pivot(ShirtSales, 'shipped', 'store__region__name', 'units')
 
         for row in pt:
-            print "*****", row['shipped'], "*****"
-            for key in row:
-                if key != 'shipped':
-                    print key, ":", row[key]
+            shipped = row['shipped']
+            for name in ['North', 'South', 'East', 'West']:
+                self.assertEqual(row[name], sum(ss.units for ss in shirt_sales if unicode(ss.shipped) == unicode(shipped) and ss.store.region.name == name))
