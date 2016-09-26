@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 from django.test import TestCase
 
-from models import ShirtSales, Store, Region
+from .models import ShirtSales, Store, Region
 from pivot import pivot
 
 
