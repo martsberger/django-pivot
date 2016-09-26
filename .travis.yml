@@ -9,13 +9,12 @@ env:
   - DJANGO=1.9 DB=sqlite
   - DJANGO=1.9 DB=mysql
   - DJANGO=1.9 DB=postgres
-
 before_script:
-  - mysql -e 'create database aggregation;'
-  - psql -c 'create database aggregation;' -U postgres
+  - mysql -e 'create database pivot;'
+  - psql -c 'create database pivot;' -U postgres
 install:
   - if [ "$DB" == "mysql" ]; then pip install mysql-python; fi
   - if [ "$DB" == "postgres" ]; then pip install psycopg2; fi
   - pip install -q Django==$DJANGO --use-mirrors
 script:
-  - python runtests.py --settings=tests.test_$DB_settings
+  - python runtests.py --settings=tests.test_$DB_setting
