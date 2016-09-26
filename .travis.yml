@@ -12,7 +12,7 @@ env:
 matrix:
   exclude:
     - python: "3.4"
-    - env: DJANGO=1.9 DB=mysql
+      env: DJANGO=1.9 DB=mysql
 before_script:
   - mysql -e 'create database pivot;'
   - psql -c 'create database pivot;' -U postgres
