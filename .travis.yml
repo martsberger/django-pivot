@@ -18,4 +18,4 @@ install:
   - if [ "$DB" == "postgres" ]; then pip install psycopg2; fi
   - pip install -q Django==$DJANGO --use-mirrors
 script:
-  - ./runtests.py --settings=tests.test_$DB
+  - python runtests.py --settings=tests.test_$DB
