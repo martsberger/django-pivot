@@ -88,3 +88,10 @@ class Tests(TestCase):
             shipped = row['shipped']
             for name in ['North', 'South', 'East', 'West']:
                 self.assertEqual(row[name], sum(ss.units for ss in shirt_sales if unicode(ss.shipped) == unicode(shipped) and ss.store.region.name == name))
+
+        pt = pivot(ShirtSales, 'shipped', 'store__name', 'units')
+
+        for row in pt:
+            shipped = row['shipped']
+            for name in ['ABC Shirts', 'Shirt Emporium', 'Just Shirts', 'Shirts R Us', 'Shirts N More']:
+                self.assertEqual(row[name], sum(ss.units for ss in shirt_sales if unicode(ss.shipped) == unicode(shipped) and ss.store.name == name))

@@ -20,6 +20,7 @@ def parse_args():
 
 if __name__ == '__main__':
     options = parse_args()
+    print "try settings", options.settings
     os.environ['DJANGO_SETTINGS_MODULE'] = options.settings
 
     # Local imports because DJANGO_SETTINGS_MODULE needs to be set first
@@ -29,7 +30,6 @@ if __name__ == '__main__':
 
     if hasattr(django, 'setup'):
         django.setup()
-
 
     TestRunner = get_runner(settings)
     runner = TestRunner(verbosity=1, interactive=True, failfast=False)
