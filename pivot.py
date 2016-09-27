@@ -1,5 +1,6 @@
-from django.db.models import Case, When, Q, F, Sum, ForeignKey
+from django.db.models import Case, When, Q, F, Sum
 from django.shortcuts import _get_queryset
+from django.utils.encoding import force_text
 
 
 def pivot(queryset, row, column, data, aggregation=Sum):
@@ -29,6 +30,6 @@ def _get_column_values(queryset, column):
 
 def _get_annotations(column, column_values, data, aggregation):
     return {
-        unicode(c): aggregation(Case(When(Q(**{column: c}), then=F(data))))
+        force_text(c): aggregation(Case(When(Q(**{column: c}), then=F(data))))
         for c in column_values
     }
