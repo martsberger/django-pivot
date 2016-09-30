@@ -1,5 +1,7 @@
 from __future__ import absolute_import
+from django.db.models import CharField, Func
 
+from django.conf import settings
 from django.test import TestCase
 from django.utils.encoding import force_text
 
@@ -9,13 +11,43 @@ from pivot import pivot
 
 genders = ['Boy', 'Girl']
 styles = ['Tee', 'Golf', 'Fancy']
-dates = ['2005-01-31',
+dates = ['2004-12-24',
+         '2005-01-31',
          '2005-02-01',
          '2005-02-02',
          '2005-03-01',
          '2005-03-02',
          '2005-04-03',
          '2005-05-06']
+store_names = [
+    'ABC Shirts',
+    'Shirt Emporium',
+    'Just Shirts',
+    'Shirts R Us',
+    'Shirts N More'
+]
+
+
+class DateFormat(Func):
+    function = 'DATE_FORMAT'
+    template = '%(function)s(%(expressions)s, "%(format)s")'
+
+    def __init__(self, *expressions, **extra):
+        strf = extra.pop('format', None)
+        extra['format'] = strf.replace("%", "%%")
+        extra['output_field'] = CharField()
+        super(DateFormat, self).__init__(*expressions, **extra)
+
+
+class StrFtime(Func):
+    function = 'strftime'
+    template = '%(function)s("%(format)s", %(expressions)s)'
+
+    def __init__(self, *expressions, **extra):
+        strf = extra.pop('format', None)
+        extra['format'] = strf.replace("%", "%%")
+        extra['output_field'] = CharField()
+        super(StrFtime, self).__init__(*expressions, **extra)
 
 
 class Tests(TestCase):
@@ -96,5 +128,35 @@ class Tests(TestCase):
 
         for row in pt:
             shipped = row['shipped']
-            for name in ['ABC Shirts', 'Shirt Emporium', 'Just Shirts', 'Shirts R Us', 'Shirts N More']:
+            for name in store_names:
                 self.assertEqual(row[name], sum(ss.units for ss in shirt_sales if force_text(ss.shipped) == force_text(shipped) and ss.store.name == name))
+
+    def test_monthly_report(self):
+        if settings.BACKEND == 'mysql':
+            annotations = {
+                'Month': DateFormat('shipped', format='%b %Y'),
+                'date_sort': DateFormat('shipped', format='%Y %m')
+            }
+        elif settings.BACKEND == 'sqlite':
+            annotations = {
+                'Month': StrFtime('shipped', format='%m-%Y'),
+                'date_sort': StrFtime('shipped', format='%Y-%m')
+            }
+        else:
+            return
+
+        shirt_sales = ShirtSales.objects.annotate(**annotations).order_by('date_sort')
+        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units')
+
+        # Get the months and assert that the order by that we sent in is respected
+        months = [record['Month'] for record in monthly_report]
+        self.assertEqual(months, ['12-2004', '01-2005', '02-2005', '03-2005', '04-2005', '05-2005'])
+
+        # Check that the aggregations are correct too
+        for record in monthly_report:
+            month, year = record['Month'].split('-')
+            for name in store_names:
+                self.assertEqual(record[name], sum(ss.units
+                                                   for ss in shirt_sales if (int(ss.shipped.year) == int(year) and
+                                                                             int(ss.shipped.month) == int(month) and
+                                                                             ss.store.name == name)))
