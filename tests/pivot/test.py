@@ -135,8 +135,8 @@ class Tests(TestCase):
     def test_monthly_report(self):
         if settings.BACKEND == 'mysql':
             annotations = {
-                'Month': DateFormat('shipped', format='%b %Y'),
-                'date_sort': DateFormat('shipped', format='%Y %m')
+                'Month': DateFormat('shipped', format='%m-%Y'),
+                'date_sort': DateFormat('shipped', format='%Y-%m')
             }
         elif settings.BACKEND == 'sqlite':
             annotations = {
@@ -151,10 +151,7 @@ class Tests(TestCase):
 
         # Get the months and assert that the order by that we sent in is respected
         months = [record['Month'] for record in monthly_report]
-        if settings.BACKEND == 'mysql':
-            month_strings = ['Dec 2004', 'Jan 2005', 'Feb 2005', 'Mar 2005', 'Apr 2005', 'May 2005']
-        else:
-            month_strings = ['12-2004', '01-2005', '02-2005', '03-2005', '04-2005', '05-2005']
+        month_strings = ['12-2004', '01-2005', '02-2005', '03-2005', '04-2005', '05-2005']
         self.assertEqual(months, month_strings)
 
         # Check that the aggregations are correct too
