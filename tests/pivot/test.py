@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.utils.encoding import force_text
 
 from .models import ShirtSales, Store, Region
+from histogram import histogram
 from pivot import pivot
 
 
@@ -69,7 +70,7 @@ class Tests(TestCase):
         Store(name='Shirts R Us', region=regions[3]).save()
         Store(name='Shirts N More', region=regions[0]).save()
 
-        units = [12, 10, 11, 15, 13, 9, 17, 3, 7]
+        units = [12, 9, 10, 15, 13, 9, 15, 3, 7]
         prices = [11.04, 13.00, 11.96, 11.27, 12.12, 13.74, 11.44, 12.63, 12.06, 13.42, 11.48]
 
         shirt_sales = [ShirtSales(store=store,
@@ -160,3 +161,22 @@ class Tests(TestCase):
                                                    for ss in shirt_sales if (int(ss.shipped.year) == int(year) and
                                                                              int(ss.shipped.month) == int(month) and
                                                                              ss.store.name == name)))
+
+    def test_histogram(self):
+        hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
+
+        d = {
+            '0': 0,
+            '10': 0,
+            '15': 0
+        }
+
+        for s in ShirtSales.objects.all():
+            if s.units < 10:
+                d['0'] += 1
+            elif s.units < 15:
+                d['10'] += 1
+            else:
+                d['15'] += 1
+
+        self.assertEqual(hist, d)

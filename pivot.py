@@ -6,7 +6,7 @@ from django.utils.encoding import force_text
 def pivot(queryset, row, column, data, aggregation=Sum):
     """
     Takes a queryset and pivots it. The result is a table with one record
-    per unique value in the row column, a column for each unique value in the column column
+    per unique value in the `row` column, a column for each unique value in the `column` column
     and values in the table aggregated by the data column.
 
     :param queryset:
