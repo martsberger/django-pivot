@@ -29,7 +29,8 @@ def _get_column_values(queryset, column):
 
 
 def _get_annotations(column, column_values, data, aggregation):
+    value = data if hasattr(data, 'resolve_expression') else F(data)
     return {
-        force_text(c): aggregation(Case(When(Q(**{column: c}), then=F(data))))
+        force_text(c): aggregation(Case(When(Q(**{column: c}), then=value)))
         for c in column_values
     }

@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from django.db.models import CharField, Func
+from django.db.models import CharField, Func, F, Avg
 
 from django.conf import settings
 from django.test import TestCase
@@ -120,6 +120,9 @@ class Tests(TestCase):
 
         pt = pivot(ShirtSales, 'shipped', 'store__region__name', 'units')
 
+        for record in pt:
+            print record
+
         for row in pt:
             shipped = row['shipped']
             for name in ['North', 'South', 'East', 'West']:
@@ -181,3 +184,16 @@ class Tests(TestCase):
                 d['15'] += 1
 
         self.assertEqual(hist, d)
+
+    def test_pivot_aggregate(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        data = F('units') * F('price')
+        pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg)
+
+        for row in pt:
+            region_name = row['store__region__name']
+            for dt in (key for key in row.keys() if key != 'store__region__name'):
+                spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
+                avg = sum(spends) / len(spends) if spends else 0
+                self.assertAlmostEqual(row[dt], float(avg))
