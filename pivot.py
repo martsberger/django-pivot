@@ -9,10 +9,11 @@ def pivot(queryset, row, column, data, aggregation=Sum):
     per unique value in the `row` column, a column for each unique value in the `column` column
     and values in the table aggregated by the data column.
 
-    :param queryset:
-    :param row:
-    :param column:
-    :param data:
+    :param queryset: a QuerySet, Model, or Manager
+    :param row: string, name of column that will key the rows
+    :param column: string, name of column that will define columns
+    :param data: column name or Combinable
+    :param aggregation: aggregation function to apply to data column
     :return: ValuesQueryset
     """
     queryset = _get_queryset(queryset)
