@@ -120,9 +120,6 @@ class Tests(TestCase):
 
         pt = pivot(ShirtSales, 'shipped', 'store__region__name', 'units')
 
-        for record in pt:
-            print record
-
         for row in pt:
             shipped = row['shipped']
             for name in ['North', 'South', 'East', 'West']:
