@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/martsberger/django-pivot.svg?branch=master)](https://travis-ci.org/martsberger/django-pivot)
+
 Django Pivot-Tables
 ===================
 

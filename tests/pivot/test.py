@@ -1,7 +1,8 @@
 from __future__ import absolute_import
-from django.db.models import CharField, Func, F, Avg
+from django.db.models import CharField, Func, F, Avg, DecimalField
 
 from django.conf import settings
+from django.db.models import ExpressionWrapper
 from django.test import TestCase
 from django.utils.encoding import force_text
 
@@ -185,7 +186,7 @@ class Tests(TestCase):
     def test_pivot_aggregate(self):
         shirt_sales = ShirtSales.objects.all()
 
-        data = F('units') * F('price')
+        data = ExpressionWrapper(F('units') * F('price'), outputfield=DecimalField())
         pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg)
 
         for row in pt:
