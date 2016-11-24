@@ -194,4 +194,4 @@ class Tests(TestCase):
             for dt in (key for key in row.keys() if key != 'store__region__name'):
                 spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
                 avg = sum(spends) / len(spends) if spends else 0
-                self.assertAlmostEqual(row[dt], float(avg))
+                self.assertAlmostEqual(row[dt], float(avg), places=4)
