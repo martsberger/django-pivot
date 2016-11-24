@@ -186,7 +186,7 @@ class Tests(TestCase):
     def test_pivot_aggregate(self):
         shirt_sales = ShirtSales.objects.all()
 
-        data = ExpressionWrapper(F('units') * F('price'), outputfield=DecimalField())
+        data = ExpressionWrapper(F('units') * F('price'), output_field=DecimalField())
         pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg)
 
         for row in pt:
