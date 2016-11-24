@@ -1,10 +1,11 @@
-[![Build Status](https://travis-ci.org/martsberger/django-pivot.svg?branch=master)](https://travis-ci.org/martsberger/django-pivot)
+.. image:: `status.jpg https://travis-ci.org/martsberger/django-pivot`_
+   :target: https://travis-ci.org/martsberger/django-pivot.svg?branch=master
 
 Django Pivot-Tables
 ===================
 
 This package provides utilities for turning Django Querysets into
-`Pivot-Tables <https://en.wikipedia.org/wiki/Pivot_table>`.
+`Pivot-Tables <https://en.wikipedia.org/wiki/Pivot_table>`_.
 
 Examples
 --------
