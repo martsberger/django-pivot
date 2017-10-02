@@ -2,10 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-pivot',
-    version='1.0',
+    version='1.0.1',
     description='Create pivot tables from ORM querysets',
     url='https://github.com/martsberger/django-pivot',
-    download_url='https://github.com/martsberger/django-pivot/archive/1.0.tar.gz',
+    download_url='https://github.com/martsberger/django-pivot/archive/1.0.1.tar.gz',
     author='Brad Martsberger',
     author_email='bmarts@procuredhealth.com',
     license='MIT',
