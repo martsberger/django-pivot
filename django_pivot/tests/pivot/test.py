@@ -7,8 +7,8 @@ from django.test import TestCase
 from django.utils.encoding import force_text
 
 from .models import ShirtSales, Store, Region
-from histogram import histogram
-from pivot import pivot
+from django_pivot.histogram import histogram
+from django_pivot.pivot import pivot
 
 
 genders = ['Boy', 'Girl']
