@@ -164,6 +164,19 @@ class Tests(TestCase):
                                                                              int(ss.shipped.month) == int(month) and
                                                                              ss.store.name == name)))
 
+    def test_pivot_aggregate(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        data = ExpressionWrapper(F('units') * F('price'), output_field=DecimalField())
+        pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg)
+
+        for row in pt:
+            region_name = row['store__region__name']
+            for dt in (key for key in row.keys() if key != 'store__region__name'):
+                spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
+                avg = sum(spends) / len(spends) if spends else 0
+                self.assertAlmostEqual(row[dt], float(avg), places=4)
+
     def test_histogram(self):
         hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
 
@@ -183,15 +196,28 @@ class Tests(TestCase):
 
         self.assertEqual(hist, d)
 
-    def test_pivot_aggregate(self):
-        shirt_sales = ShirtSales.objects.all()
+    def test_multi_histogram(self):
+        hist = histogram(ShirtSales, 'units', bins=[0, 10, 15], field='gender')
 
-        data = ExpressionWrapper(F('units') * F('price'), output_field=DecimalField())
-        pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg)
+        expected = [{'bin': '0', 'Boy': 0, 'Girl': 0},
+                    {'bin': '10', 'Boy': 0, 'Girl': 0},
+                    {'bin': '15', 'Boy': 0, 'Girl': 0}]
 
-        for row in pt:
-            region_name = row['store__region__name']
-            for dt in (key for key in row.keys() if key != 'store__region__name'):
-                spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
-                avg = sum(spends) / len(spends) if spends else 0
-                self.assertAlmostEqual(row[dt], float(avg), places=4)
+        for s in ShirtSales.objects.all():
+            if s.units < 10:
+                if s.gender == 'Boy':
+                    expected[0]['Boy'] += 1
+                if s.gender == 'Girl':
+                    expected[0]['Girl'] += 1
+            elif s.units < 15:
+                if s.gender == 'Boy':
+                    expected[1]['Boy'] += 1
+                if s.gender == 'Girl':
+                    expected[1]['Girl'] += 1
+            else:
+                if s.gender == 'Boy':
+                    expected[2]['Boy'] += 1
+                if s.gender == 'Girl':
+                    expected[2]['Girl'] += 1
+
+        self.assertEqual(list(hist), expected)
