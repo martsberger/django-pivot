@@ -5,7 +5,8 @@ Django Pivot-Tables
 ===================
 
 This package provides utilities for turning Django Querysets into
-`Pivot-Tables <https://en.wikipedia.org/wiki/Pivot_table>`_.
+`Pivot-Tables <https://en.wikipedia.org/wiki/Pivot_table>`_ and Histograms
+by letting your database do all the heavy lifting.
 
 Examples
 --------
@@ -115,3 +116,46 @@ dictionary with a string version of the bin edges for keys, e.g.:
 >>> hist
 {u'0': 106, u'15': 53, u'10': 81}
 
+It's also possible to get several histograms from a single query by slicing the data on one
+of the columns. For example, instead of the histogram above, we might want two histograms,
+one for boys and one for girls. The gender column of ShirtSales has two values, 'Boy' and
+'Girl'. Passing the gender column as a 4th optional parameter to histogram will slice the
+data on that column.
+
+>>> hist = histogram(ShirtSales, 'units', bins=[0, 10, 15], slice_on='gender')
+
+The result is a ValuesQuerySet where each row corresponds to one bin
+
+>>> for row in hist:
+        print row
+{'bin': u'0', u'Boy': 53, u'Girl': 53}
+{'bin': u'10', u'Boy': 40, u'Girl': 41}
+{'bin': u'15', u'Boy': 27, u'Girl': 26}
+
+
+Installation
+------------
+
+Just
+
+    pip install django-pivot
+
+put django_pivot in installed apps in your settings file, and then you
+
+    from django_pivot.pivot import pivot
+    from django_pivot.histogram import histogram
+
+And off you go.
+
+
+Tests
+-----
+
+The test suite is run by `Travis <https://travis-ci.org/martsberger/django-pivot>`_
+with Django versions 1.10 and 1.11 and backends sqlite, MySQL, and Postgres. If you
+want to run the test suite locally, from the root directory:
+
+    python runtests.py --settings=django_pivot.tests.test_sqlite_settings
+
+That will use sqlite as the backend and whatever version of Django you have
+in your current environment.

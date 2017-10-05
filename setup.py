@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name='django-pivot',
     version='1.2',
-    description='Create pivot tables from ORM querysets',
+    description='Create pivot tables and histograms from ORM querysets',
     url='https://github.com/martsberger/django-pivot',
     download_url='https://github.com/martsberger/django-pivot/archive/1.2.tar.gz',
     author='Brad Martsberger',

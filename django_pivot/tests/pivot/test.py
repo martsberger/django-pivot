@@ -197,7 +197,7 @@ class Tests(TestCase):
         self.assertEqual(hist, d)
 
     def test_multi_histogram(self):
-        hist = histogram(ShirtSales, 'units', bins=[0, 10, 15], field='gender')
+        hist = histogram(ShirtSales, 'units', bins=[0, 10, 15], slice_on='gender')
 
         expected = [{'bin': '0', 'Boy': 0, 'Girl': 0},
                     {'bin': '10', 'Boy': 0, 'Girl': 0},

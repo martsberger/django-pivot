@@ -4,11 +4,11 @@ from django.shortcuts import _get_queryset
 from django.utils.encoding import force_text
 
 
-def histogram(queryset, column, bins, field=None):
-    if field is None:
+def histogram(queryset, column, bins, slice_on=None):
+    if slice_on is None:
         return simple_histogram(queryset, column, bins)
     else:
-        return multi_histogram(queryset, column, bins, field)
+        return multi_histogram(queryset, column, bins, slice_on)
 
 
 def simple_histogram(queryset, column, bins):
@@ -36,7 +36,7 @@ def between_include_start(column, start, end, value=1):
     return When(Q(**{column + '__gte': start, column + '__lt': end}), then=value)
 
 
-def multi_histogram(queryset, column, bins, field):
+def multi_histogram(queryset, column, bins, slice_on):
     """
     Returns a table of histograms, one for each unique value of field in queryset.
 
@@ -44,12 +44,12 @@ def multi_histogram(queryset, column, bins, field):
     :param column: The column we are aggregating into a histogram
     :param bins: An ordered iterable of left endpoints of the bins. Must have at least two elements.
     The endpoints must be a convertible to strings by force_text
-    :param field: A field of the queryset that we are slicing the histograms on
+    :param slice_on: A field of the queryset that we are slicing the histograms on
     :return: A ValuesQuerySet
     """
     queryset = _get_queryset(queryset)
 
-    field_values = queryset.values_list(field, flat=True)
+    field_values = queryset.values_list(slice_on, flat=True)
 
     bins = [force_text(bin) for bin in bins]
 
@@ -73,7 +73,7 @@ def multi_histogram(queryset, column, bins, field):
     }
 
     histogram_annotation = {
-        field_value: Count(Case(When(Q(**{field: field_value}), then=1), output_field=IntegerField()))
+        field_value: Count(Case(When(Q(**{slice_on: field_value}), then=1), output_field=IntegerField()))
         for field_value in field_values
     }
 
