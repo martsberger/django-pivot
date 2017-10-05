@@ -18,5 +18,5 @@ setup(
         'Programming Language :: Python :: 3.6'
     ],
     packages=find_packages(),
-    install_requires=['django>=1.8']
+    install_requires=['django>=1.10']
 )

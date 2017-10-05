@@ -8,7 +8,6 @@ services:
   - mysql
   - postgresql
 env:
-  - DJANGO=1.9 DB=sqlite
   - DJANGO=1.10 DB=sqlite
   - DJANGO=1.11 DB=sqlite
   - DJANGO=1.11 DB=mysql
