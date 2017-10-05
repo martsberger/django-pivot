@@ -8,12 +8,12 @@ DATABASES = {
 }
 
 INSTALLED_APPS = (
-    'tests.pivot',
+    'django_pivot.tests.pivot',
 )
 
-SITE_ID=1,
+SITE_ID = 1,
 
-SECRET_KEY='secret'
+SECRET_KEY = 'secret'
 
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
