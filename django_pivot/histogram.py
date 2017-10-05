@@ -60,8 +60,16 @@ def multi_histogram(queryset, column, bins, field):
         When(Q(**{column + '__gte': bins[-1]}), Value(force_text(bins[-1]))),
     )
 
+    ordering_whens = tuple(
+        between_include_start(column, bins[k], bins[k + 1], Value(k))
+        for k in range(len(bins) - 1)
+    ) + (
+        When(Q(**{column + '__gte': bins[-1]}), Value(len(bins) - 1)),
+    )
+
     bin_annotation = {
-        'bin': Case(*whens, output_field=CharField())
+        'bin': Case(*whens, output_field=CharField()),
+        'order': Case(*ordering_whens, output_field=IntegerField())
     }
 
     histogram_annotation = {
@@ -69,4 +77,4 @@ def multi_histogram(queryset, column, bins, field):
         for field_value in field_values
     }
 
-    return queryset.annotate(**bin_annotation).values('bin').filter(bin__isnull=False).annotate(**histogram_annotation)
+    return queryset.annotate(**bin_annotation).order_by('order').values('bin').filter(bin__isnull=False).annotate(**histogram_annotation)
