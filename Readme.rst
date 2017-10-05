@@ -1,5 +1,5 @@
 .. image:: https://travis-ci.org/martsberger/django-pivot.svg?branch=master
-   :target: https://travis-ci.org/martsberger/django-pivot
+    :target: https://travis-ci.org/martsberger/django-pivot
 
 Django Pivot-Tables
 ===================
