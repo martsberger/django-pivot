@@ -138,7 +138,7 @@ Installation
 
 Just::
 
-    ``pip install django-pivot``
+    pip install django-pivot
 
 put django_pivot in installed apps in your settings file, and then you::
 
@@ -153,7 +153,7 @@ Tests
 
 The test suite is run by `Travis <https://travis-ci.org/martsberger/django-pivot>`_
 with Django versions 1.10 and 1.11 and backends sqlite, MySQL, and Postgres. If you
-want to run the test suite locally, from the root directory:
+want to run the test suite locally, from the root directory::
 
     python runtests.py --settings=django_pivot.tests.test_sqlite_settings
 
