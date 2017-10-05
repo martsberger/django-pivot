@@ -118,9 +118,9 @@ dictionary with a string version of the bin edges for keys, e.g.:
 
 It's also possible to get several histograms from a single query by slicing the data on one
 of the columns. For example, instead of the histogram above, we might want two histograms,
-one for boys and one for girls. The gender column of ShirtSales has two values, 'Boy' and
-'Girl'. Passing the gender column as a 4th optional parameter to histogram will slice the
-data on that column.
+one for boys and one for girls. The ``gender`` column of ``ShirtSales`` has two values,
+``'Boy'`` and ``'Girl'``. Passing the gender column as a 4th optional parameter to histogram
+will slice the data on that column.
 
 >>> hist = histogram(ShirtSales, 'units', bins=[0, 10, 15], slice_on='gender')
 
@@ -136,11 +136,11 @@ The result is a ValuesQuerySet where each row corresponds to one bin
 Installation
 ------------
 
-Just
+Just::
 
-    pip install django-pivot
+    ``pip install django-pivot``
 
-put django_pivot in installed apps in your settings file, and then you
+put django_pivot in installed apps in your settings file, and then you::
 
     from django_pivot.pivot import pivot
     from django_pivot.histogram import histogram
