@@ -1,9 +1,10 @@
 from django.db.models import Case, When, Q, F, Sum
 from django.shortcuts import _get_queryset
-from django.utils.encoding import force_text
+
+from utils import get_column_values
 
 
-def pivot(queryset, row, column, data, aggregation=Sum):
+def pivot(queryset, row, column, data, aggregation=Sum, choices='auto'):
     """
     Takes a queryset and pivots it. The result is a table with one record
     per unique value in the `row` column, a column for each unique value in the `column` column
@@ -18,7 +19,7 @@ def pivot(queryset, row, column, data, aggregation=Sum):
     """
     queryset = _get_queryset(queryset)
 
-    column_values = _get_column_values(queryset, column).order_by(column)
+    column_values = get_column_values(queryset, column, choices)
 
     annotations = _get_annotations(column, column_values, data, aggregation)
 
@@ -32,6 +33,6 @@ def _get_column_values(queryset, column):
 def _get_annotations(column, column_values, data, aggregation):
     value = data if hasattr(data, 'resolve_expression') else F(data)
     return {
-        force_text(c): aggregation(Case(When(Q(**{column: c}), then=value)))
-        for c in column_values
+        display_value: aggregation(Case(When(Q(**{column: column_value}), then=value)))
+        for column_value, display_value in column_values
     }
