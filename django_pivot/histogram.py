@@ -3,12 +3,14 @@ from django.db.models import Value
 from django.shortcuts import _get_queryset
 from django.utils.encoding import force_text
 
+from django_pivot.utils import get_column_values
 
-def histogram(queryset, column, bins, slice_on=None):
+
+def histogram(queryset, column, bins, slice_on=None, choices='auto'):
     if slice_on is None:
         return simple_histogram(queryset, column, bins)
     else:
-        return multi_histogram(queryset, column, bins, slice_on)
+        return multi_histogram(queryset, column, bins, slice_on, choices)
 
 
 def simple_histogram(queryset, column, bins):
@@ -36,7 +38,7 @@ def between_include_start(column, start, end, value=1):
     return When(Q(**{column + '__gte': start, column + '__lt': end}), then=value)
 
 
-def multi_histogram(queryset, column, bins, slice_on):
+def multi_histogram(queryset, column, bins, slice_on, choices):
     """
     Returns a table of histograms, one for each unique value of field in queryset.
 
@@ -49,7 +51,7 @@ def multi_histogram(queryset, column, bins, slice_on):
     """
     queryset = _get_queryset(queryset)
 
-    field_values = queryset.values_list(slice_on, flat=True)
+    field_values = get_column_values(queryset, slice_on, choices)
 
     bins = [force_text(bin) for bin in bins]
 
@@ -73,8 +75,8 @@ def multi_histogram(queryset, column, bins, slice_on):
     }
 
     histogram_annotation = {
-        field_value: Count(Case(When(Q(**{slice_on: field_value}), then=1), output_field=IntegerField()))
-        for field_value in field_values
+        display_value: Count(Case(When(Q(**{slice_on: field_value}), then=1), output_field=IntegerField()))
+        for field_value, display_value in field_values
     }
 
     return queryset.annotate(**bin_annotation).order_by('order').values('bin').filter(bin__isnull=False).annotate(**histogram_annotation)
