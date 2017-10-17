@@ -1,7 +1,7 @@
 from django.db.models import Case, When, Q, F, Sum
 from django.shortcuts import _get_queryset
 
-from utils import get_column_values
+from django_pivot.utils import get_column_values
 
 
 def pivot(queryset, row, column, data, aggregation=Sum, choices='auto'):
