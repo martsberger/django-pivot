@@ -25,13 +25,9 @@ def simple_histogram(queryset, column, bins):
     """
     queryset = _get_queryset(queryset)
 
-    aggregations = {
-        force_text(bins[k]): Count(Case(between_include_start(column, bins[k], bins[k + 1])))
-        for k in range(len(bins) - 1)
-    }
-    aggregations[force_text(bins[-1])] = Count(Case(When(Q(**{column + '__gte': bins[-1]}), then=1)))
+    queryset = queryset.annotate(column_name=Value(column, output_field=CharField()))
 
-    return queryset.aggregate(**aggregations)
+    return multi_histogram(queryset, column, bins, slice_on='column_name', choices=((column, column),))
 
 
 def between_include_start(column, start, end, value=1):

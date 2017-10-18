@@ -180,21 +180,19 @@ class Tests(TestCase):
     def test_histogram(self):
         hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
 
-        d = {
-            '0': 0,
-            '10': 0,
-            '15': 0
-        }
+        expected = [{'bin': '0', 'units': 0},
+                    {'bin': '10', 'units': 0},
+                    {'bin': '15', 'units': 0}]
 
         for s in ShirtSales.objects.all():
             if s.units < 10:
-                d['0'] += 1
+                expected[0]['units'] += 1
             elif s.units < 15:
-                d['10'] += 1
+                expected[1]['units'] += 1
             else:
-                d['15'] += 1
+                expected[2]['units'] += 1
 
-        self.assertEqual(hist, d)
+        self.assertEqual(hist, expected)
 
     def test_multi_histogram(self):
         hist = histogram(ShirtSales, 'units', bins=[0, 10, 15], slice_on='gender')
