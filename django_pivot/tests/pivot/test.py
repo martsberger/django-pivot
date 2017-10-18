@@ -221,3 +221,18 @@ class Tests(TestCase):
                     expected[2]['Girl'] += 1
 
         self.assertEqual(list(hist), expected)
+
+    def test_histograms_with_zeros(self):
+        hist = histogram(ShirtSales, 'units', bins=[0, 1, 2, 3, 10, 14, 15, 100, 150], slice_on='gender')
+
+        # The first 3 buckets have all zero values.
+        self.assertEqual(hist[0], {'bin': '0', 'Boy': 0, 'Girl': 0})
+        self.assertEqual(hist[1], {'bin': '1', 'Boy': 0, 'Girl': 0})
+        self.assertEqual(hist[2], {'bin': '2', 'Boy': 0, 'Girl': 0})
+
+        # A bucket in the middle has zeros
+        self.assertEqual(hist[5], {'bin': '14', 'Boy': 0, 'Girl': 0})
+
+        # The last 3 buckets have zero values
+        self.assertEqual(hist[7], {'bin': '100', 'Boy': 0, 'Girl': 0})
+        self.assertEqual(hist[8], {'bin': '150', 'Boy': 0, 'Girl': 0})

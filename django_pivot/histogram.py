@@ -79,4 +79,39 @@ def multi_histogram(queryset, column, bins, slice_on, choices):
         for field_value, display_value in field_values
     }
 
-    return queryset.annotate(**bin_annotation).order_by('order').values('bin').filter(bin__isnull=False).annotate(**histogram_annotation)
+    qs = queryset.annotate(**bin_annotation).order_by('order').values('bin').filter(bin__isnull=False).annotate(**histogram_annotation)
+
+    return _zero_fill(qs, bins, field_values)
+
+
+def _zero_fill(qs, bins, field_values):
+    """
+    If a bin has zero counts for every histogram, there is no mechanism in SQL
+    to get a record for this bin from just the table being queried. (The SQL
+    workaround is to create a temp table of bins and join to it -- gross.)
+
+    :param qs: This histogram queryset with zeros missing
+    :param bins: The left edges of the bins as passed to histogram
+    :param field_values: A list of tuples for the choices of the slice_on field
+    :return: A list of dictionaries with the zero values filled in
+    """
+    zeros = {display_value: 0 for field_value, display_value in field_values}
+
+    iter_qs = iter(qs)
+
+    result = []
+    next_bin = iter_qs.next()
+
+    for binn in bins:
+        if next_bin['bin'] == binn:
+            result.append(next_bin)
+            try:
+                next_bin = iter_qs.next()
+            except StopIteration:
+                pass
+        else:
+            this_bin = {'bin': binn}
+            this_bin.update(zeros)
+            result.append(this_bin)
+
+    return result
