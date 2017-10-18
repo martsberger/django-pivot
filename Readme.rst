@@ -111,10 +111,12 @@ of bins.
 >>> hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
 
 Like *pivot*, the first argument can be a Model, QuerySet, or Manager. The result is a
-dictionary with a string version of the bin edges for keys, e.g.:
+list of dictionaries:
 
 >>> hist
-{u'0': 106, u'15': 53, u'10': 81}
+[{'bin': '0', 'units': 0},
+{'bin': '10', 'units': 0},
+{'bin': '15', 'units': 0}]
 
 It's also possible to get several histograms from a single query by slicing the data on one
 of the columns. For example, instead of the histogram above, we might want two histograms,
