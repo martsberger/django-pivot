@@ -100,13 +100,13 @@ def _zero_fill(qs, bins, field_values):
     iter_qs = iter(qs)
 
     result = []
-    next_bin = iter_qs.next()
+    next_bin = next(iter_qs)
 
     for binn in bins:
         if next_bin['bin'] == binn:
             result.append(next_bin)
             try:
-                next_bin = iter_qs.next()
+                next_bin = next(iter_qs)
             except StopIteration:
                 pass
         else:
