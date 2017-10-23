@@ -26,10 +26,6 @@ def pivot(queryset, row, column, data, aggregation=Sum, choices='auto'):
     return queryset.values(row).annotate(**annotations)
 
 
-def _get_column_values(queryset, column):
-    return queryset.values_list(column, flat=True).distinct()
-
-
 def _get_annotations(column, column_values, data, aggregation):
     value = data if hasattr(data, 'resolve_expression') else F(data)
     return {
