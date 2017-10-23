@@ -17,7 +17,10 @@ class Store(models.Model):
 
 
 class ShirtSales(models.Model):
-    gender = models.CharField(max_length=4)
+    GENDER_CHOICES = (('B', 'Boy'),
+                      ('G', 'Girl'))
+
+    gender = models.CharField(max_length=4, choices=GENDER_CHOICES)
     style = models.CharField(max_length=5)
     shipped = models.DateField()
     units = models.IntegerField()

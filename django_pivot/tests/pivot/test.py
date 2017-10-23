@@ -11,7 +11,7 @@ from django_pivot.histogram import histogram
 from django_pivot.pivot import pivot
 
 
-genders = ['Boy', 'Girl']
+genders = ['B', 'G']
 styles = ['Tee', 'Golf', 'Fancy']
 dates = ['2004-12-24',
          '2005-01-31',
@@ -97,7 +97,8 @@ class Tests(TestCase):
         for row in pt:
             style = row['style']
             for gender in genders:
-                self.assertEqual(row[gender], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
+                gender_display = 'Boy' if gender == 'B' else 'Girl'
+                self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
 
     def test_pivot_on_date(self):
         shirt_sales = ShirtSales.objects.all()
@@ -203,19 +204,19 @@ class Tests(TestCase):
 
         for s in ShirtSales.objects.all():
             if s.units < 10:
-                if s.gender == 'Boy':
+                if s.gender == 'B':
                     expected[0]['Boy'] += 1
-                if s.gender == 'Girl':
+                if s.gender == 'G':
                     expected[0]['Girl'] += 1
             elif s.units < 15:
-                if s.gender == 'Boy':
+                if s.gender == 'B':
                     expected[1]['Boy'] += 1
-                if s.gender == 'Girl':
+                if s.gender == 'G':
                     expected[1]['Girl'] += 1
             else:
-                if s.gender == 'Boy':
+                if s.gender == 'B':
                     expected[2]['Boy'] += 1
-                if s.gender == 'Girl':
+                if s.gender == 'G':
                     expected[2]['Girl'] += 1
 
         self.assertEqual(list(hist), expected)

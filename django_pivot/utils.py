@@ -3,16 +3,21 @@ from django.utils.encoding import force_text
 
 
 def get_column_values(queryset, field, choices):
-    field_object = _get_field(queryset.model, field)
-    if choices == 'auto' and getattr(field_object, 'choices', None):
-        field_values = field_object.choices
-    elif choices == 'auto' or choices == 'minimum':
-        database_values = queryset.values_list(field, flat=True).distinct().order_by(field)
-        field_values = [(field_value, force_text(field_value)) for field_value in database_values]
-    else:
-        field_values = choices
+    if choices == 'auto':
+        choices = get_field_choices(queryset, field) or _database_choices(queryset, field)
+    elif choices == 'minimum':
+        choices = _database_choices(queryset, field)
 
-    return field_values
+    return choices
+
+
+def get_field_choices(queryset, field):
+    field_object = _get_field(queryset.model, field)
+    return getattr(field_object, 'choices', None)
+
+
+def _database_choices(queryset, field):
+    return [(value, force_text(value)) for value in queryset.values_list(field, flat=True).distinct().order_by(field)]
 
 
 def _get_field(model, field_names):

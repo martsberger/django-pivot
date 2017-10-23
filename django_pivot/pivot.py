@@ -1,7 +1,7 @@
 from django.db.models import Case, When, Q, F, Sum
 from django.shortcuts import _get_queryset
 
-from django_pivot.utils import get_column_values
+from django_pivot.utils import get_column_values, get_field_choices
 
 
 def pivot(queryset, row, column, data, aggregation=Sum, choices='auto'):
@@ -22,6 +22,13 @@ def pivot(queryset, row, column, data, aggregation=Sum, choices='auto'):
     column_values = get_column_values(queryset, column, choices)
 
     annotations = _get_annotations(column, column_values, data, aggregation)
+
+    row_choices = get_field_choices(queryset, row)
+    if row_choices:
+        whens = (When(Q(**{row: value}), then=display_value) for value, display_value in row_choices)
+        row_display = Case(*whens)
+        queryset = queryset.annotate(row_display=row_display)
+        row = 'row_display'
 
     return queryset.values(row).annotate(**annotations)
 
