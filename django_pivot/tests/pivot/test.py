@@ -100,6 +100,17 @@ class Tests(TestCase):
                 gender_display = 'Boy' if gender == 'B' else 'Girl'
                 self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
 
+    def test_pivot_on_choice_field_row(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        pt = pivot(ShirtSales.objects.all(), 'gender', 'style', 'units')
+
+        for row in pt:
+            gender = row['gender']
+            for style in styles:
+                self.assertEqual(row[style], sum(ss.units for ss in shirt_sales if
+                                                 force_text(ss.gender) == force_text(gender) and ss.style == style))
+
     def test_pivot_on_date(self):
         shirt_sales = ShirtSales.objects.all()
 
