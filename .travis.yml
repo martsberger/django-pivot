@@ -28,6 +28,12 @@ matrix:
       env: DJANGO=2.1.3 DB=mysql
     - python: "2.7"
       env: DJANGO=2.1.3 DB=postgres
+    - python: "3.4"
+      env: DJANGO=2.1.3 DB=sqlite
+    - python: "3.4"
+      env: DJANGO=2.1.3 DB=mysql
+    - python: "3.4"
+      env: DJANGO=2.1.3 DB=postgres
 
 before_script:
   - mysql -e 'create database pivot;'
