@@ -15,6 +15,14 @@ env:
   - DJANGO=2.0.9 DB=sqlite
   - DJANGO=2.0.9 DB=mysql
   - DJANGO=2.0.9 DB=postgres
+matrix:
+  exclude:
+    - python: "2.7"
+      env: DJANGO=2.0.9 DB=sqlite
+    - python: "2.7"
+      env: DJANGO=2.0.9 DB=mysql
+    - python: "2.7"
+      env: DJANGO=2.0.9 DB=postgres
 
 before_script:
   - mysql -e 'create database pivot;'

@@ -10,7 +10,7 @@ class Region(models.Model):
 
 class Store(models.Model):
     name = models.CharField(max_length=20)
-    region = models.ForeignKey(Region)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
 
     def __unicode__(self):
         return self.name
@@ -25,4 +25,4 @@ class ShirtSales(models.Model):
     shipped = models.DateField()
     units = models.IntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    store = models.ForeignKey(Store)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
