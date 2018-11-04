@@ -8,21 +8,26 @@ services:
   - mysql
   - postgresql
 env:
-  - DJANGO=1.10 DB=sqlite
   - DJANGO=1.11 DB=sqlite
   - DJANGO=1.11 DB=mysql
   - DJANGO=1.11 DB=postgres
-  - DJANGO=2.0.9 DB=sqlite
   - DJANGO=2.0.9 DB=mysql
   - DJANGO=2.0.9 DB=postgres
+  - DJANGO=2.1.3 DB=sqlite
+  - DJANGO=2.1.3 DB=mysql
+  - DJANGO=2.1.3 DB=postgres
 matrix:
   exclude:
-    - python: "2.7"
-      env: DJANGO=2.0.9 DB=sqlite
     - python: "2.7"
       env: DJANGO=2.0.9 DB=mysql
     - python: "2.7"
       env: DJANGO=2.0.9 DB=postgres
+    - python: "2.7"
+      env: DJANGO=2.1.3 DB=sqlite
+    - python: "2.7"
+      env: DJANGO=2.1.3 DB=mysql
+    - python: "2.7"
+      env: DJANGO=2.1.3 DB=postgres
 
 before_script:
   - mysql -e 'create database pivot;'
