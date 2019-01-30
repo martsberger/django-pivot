@@ -1,15 +1,13 @@
 from __future__ import absolute_import
-from django.db.models import CharField, Func, F, Avg, DecimalField
 
 from django.conf import settings
-from django.db.models import ExpressionWrapper
+from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper
 from django.test import TestCase
 from django.utils.encoding import force_text
 
-from .models import ShirtSales, Store, Region
 from django_pivot.histogram import histogram
 from django_pivot.pivot import pivot
-
+from .models import ShirtSales, Store, Region
 
 genders = ['B', 'G']
 styles = ['Tee', 'Golf', 'Fancy']
@@ -188,6 +186,30 @@ class Tests(TestCase):
                 spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
                 avg = sum(spends) / len(spends) if spends else 0
                 self.assertAlmostEqual(row[dt], float(avg), places=4)
+
+    def test_pivot_prefix(self):
+        prefix = 'pivot_'
+        shirt_sales = ShirtSales.objects.all()
+
+        pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units', prefix=prefix)
+
+        for row in pt:
+            style = row['style']
+            for gender in genders:
+                gender_display = prefix + ('Boy' if gender == 'B' else 'Girl')
+                self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
+
+    def test_pivot_multiple_rows(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        pt = pivot(ShirtSales.objects.all(), ('style', 'store'), 'gender', 'units')
+
+        for row in pt:
+            style = row['style']
+            store = row['store']
+            for gender in genders:
+                gender_display = 'Boy' if gender == 'B' else 'Girl'
+                self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender and ss.store_id == store))
 
     def test_histogram(self):
         hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
