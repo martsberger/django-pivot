@@ -5,7 +5,7 @@ from django.shortcuts import _get_queryset
 from django_pivot.utils import get_column_values, get_field_choices
 
 
-def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', prefix=''):
+def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display_transform=lambda s: s):
     """
     Takes a queryset and pivots it. The result is a table with one record
     per unique value in the `row` column, a column for each unique value in the `column` column
@@ -16,7 +16,7 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', prefix=
     :param column: string, name of column that will define columns
     :param data: column name or Combinable
     :param aggregation: aggregation function to apply to data column
-    :param prefix: string added at a beginning data column name
+    :param display_transform: function that takes a string and returns a string
     :return: ValuesQueryset
     """
     values = [rows] if isinstance(rows, six.string_types) else list(rows)
@@ -26,7 +26,7 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', prefix=
 
     column_values = get_column_values(queryset, column, choices)
 
-    annotations = _get_annotations(column, column_values, data, aggregation, prefix)
+    annotations = _get_annotations(column, column_values, data, aggregation, display_transform)
 
     row_choices = get_field_choices(queryset, row)
     if row_choices:
@@ -38,9 +38,9 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', prefix=
     return queryset.values(*values).annotate(**annotations)
 
 
-def _get_annotations(column, column_values, data, aggregation, prefix=''):
+def _get_annotations(column, column_values, data, aggregation, display_transform=lambda s: s):
     value = data if hasattr(data, 'resolve_expression') else F(data)
     return {
-        prefix + display_value: aggregation(Case(When(Q(**{column: column_value}), then=value)))
+        display_transform(display_value): aggregation(Case(When(Q(**{column: column_value}), then=value)))
         for column_value, display_value in column_values
     }

@@ -187,16 +187,17 @@ class Tests(TestCase):
                 avg = sum(spends) / len(spends) if spends else 0
                 self.assertAlmostEqual(row[dt], float(avg), places=4)
 
-    def test_pivot_prefix(self):
-        prefix = 'pivot_'
+    def test_pivot_display_transform(self):
+        def display_transform(string):
+            return 'prefix_' + string
         shirt_sales = ShirtSales.objects.all()
 
-        pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units', prefix=prefix)
+        pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units', display_transform=display_transform)
 
         for row in pt:
             style = row['style']
             for gender in genders:
-                gender_display = prefix + ('Boy' if gender == 'B' else 'Girl')
+                gender_display = display_transform('Boy' if gender == 'B' else 'Girl')
                 self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
 
     def test_pivot_multiple_rows(self):
@@ -210,6 +211,18 @@ class Tests(TestCase):
             for gender in genders:
                 gender_display = 'Boy' if gender == 'B' else 'Girl'
                 self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender and ss.store_id == store))
+
+    def test_pivot_on_choice_field_row_with_multiple_rows(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        pt = pivot(ShirtSales.objects.all(), ('gender', 'store'), 'style', 'units')
+
+        for row in pt:
+            gender = row['gender']
+            store = row['store']
+            for style in styles:
+                self.assertEqual(row[style], sum(ss.units for ss in shirt_sales if
+                                                 force_text(ss.gender) == force_text(gender) and ss.style == style and ss.store_id == store))
 
     def test_histogram(self):
         hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
