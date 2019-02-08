@@ -20,20 +20,19 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
     :return: ValuesQueryset
     """
     values = [rows] if isinstance(rows, six.string_types) else list(rows)
-    row = values[0]
 
     queryset = _get_queryset(queryset)
 
     column_values = get_column_values(queryset, column, choices)
 
     annotations = _get_annotations(column, column_values, data, aggregation, display_transform)
-
-    row_choices = get_field_choices(queryset, row)
-    if row_choices:
-        whens = (When(Q(**{row: value}), then=Value(display_value, output_field=CharField())) for value, display_value in row_choices)
-        row_display = Case(*whens)
-        queryset = queryset.annotate(**{'get_' + row + '_display': row_display})
-        values.append('get_' + row + '_display')
+    for row in values:
+        row_choices = get_field_choices(queryset, row)
+        if row_choices:
+            whens = (When(Q(**{row: value}), then=Value(display_value, output_field=CharField())) for value, display_value in row_choices)
+            row_display = Case(*whens)
+            queryset = queryset.annotate(**{'get_' + row + '_display': row_display})
+            values.append('get_' + row + '_display')
 
     return queryset.values(*values).annotate(**annotations)
 

@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from itertools import chain
+
 from django.conf import settings
 from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper
 from django.test import TestCase
@@ -216,13 +218,17 @@ class Tests(TestCase):
         shirt_sales = ShirtSales.objects.all()
 
         pt = pivot(ShirtSales.objects.all(), ('gender', 'store'), 'style', 'units')
+        pt_reverse_rows = pivot(ShirtSales.objects.all(), ('store', 'gender'), 'style', 'units')
 
-        for row in pt:
+        for row in chain(pt, pt_reverse_rows):
             gender = row['gender']
             store = row['store']
+            self.assertIn('get_gender_display', row)
             for style in styles:
-                self.assertEqual(row[style], sum(ss.units for ss in shirt_sales if
-                                                 force_text(ss.gender) == force_text(gender) and ss.style == style and ss.store_id == store))
+                self.assertEqual(row[style], sum(ss.units for ss in shirt_sales
+                                                 if force_text(ss.gender) == force_text(gender)
+                                                 and ss.style == style
+                                                 and ss.store_id == store))
 
     def test_histogram(self):
         hist = histogram(ShirtSales, 'units', bins=[0, 10, 15])
