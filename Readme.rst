@@ -63,7 +63,7 @@ dictionary has a key for the row ('shipped' dates in this case) and a key for ev
 of the column ('region' in this case).
 
 >>> for record in pivot_table:
-...     print record
+...     print(record)
 ... {u'West': 59, 'shipped': datetime.date(2004, 12, 24), u'East': 71, u'North': 115, u'South': 56}
 ... {u'West': 55, 'shipped': datetime.date(2005, 1, 31), u'East': 65, u'North': 121, u'South': 66}
 ... {u'West': 56, 'shipped': datetime.date(2005, 2, 1), u'East': 62, u'North': 124, u'South': 68}
@@ -144,7 +144,7 @@ will slice the data on that column.
 The result is a ValuesQuerySet where each row corresponds to one bin
 
 >>> for row in hist:
-        print row
+        print(row)
 {'bin': u'0', u'Boy': 53, u'Girl': 53}
 {'bin': u'10', u'Boy': 40, u'Girl': 41}
 {'bin': u'15', u'Boy': 27, u'Girl': 26}
