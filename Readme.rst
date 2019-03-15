@@ -79,7 +79,7 @@ in each region for every shipped date, but only for Golf shirts:
 
 >>> pivot_table = pivot(ShirtSales.objects.filter(style='Golf'), 'region', 'shipped', 'units')
 
-The pivot function takes an option parameter for how to aggregate the data. For example,
+The pivot function takes an optional parameter for how to aggregate the data. For example,
 instead of the total units sold in each region for every ship date, we might be interested in
 the average number of units per order. Then we can pass the Avg aggregation function
 
@@ -116,6 +116,25 @@ you want them all lower cased, you can do the following
 >>> def lowercase(s):
 >>>     return s.lower()
 >>> pivot_table = pivot(ShirtSales, 'region', 'shipped', 'units', display_transform=lowercase)
+
+If there are no records in the original data table for a particular cell in the pivot result,
+SQL will return NULL and this gets translated to None in python. If you want to get zero, or
+some other default, you can pass that as a parameter to pivot:
+
+>>> pivot_table = pivot(ShirtSales, 'region', 'shipped', 'units', default=0)
+
+The above call ensures that when there are no units sold in a particular region on a particular
+date, we get zero as the result instead of None. However, the results will only contain
+shipped dates if at least one region had sales on that date. If it's necessary to get results
+for all dates in a range including dates where there are no ShirtSales records, we can pass
+a target row_range:
+
+>>> from datetime import date, timedelta
+>>> row_range = [date(2005, 1, 1) + timedelta(days) for days in range(59)]
+>>> pivot_table = pivot(ShirtSales, 'region', 'shipped', 'units', default=0, row_range=row_range)
+
+Will output a result with every shipped date from Jan 1st to February 28th whether there are
+sales on those days or not.
 
 *The histogram function*
 

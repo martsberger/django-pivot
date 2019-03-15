@@ -32,3 +32,20 @@ def _get_field(model, field_names):
             model = field.related_model
         else:
             return field
+
+
+def default_fill(data, attribute, target_range, fill_value=None, fill_attributes=()):
+    indx = 0
+    new_data = list()
+    fill_dict = {attribute: fill_value for attribute in fill_attributes}
+    for element in target_range:
+
+        if indx < len(data) and data[indx][attribute] == element:
+            new_data.append(data[indx])
+            indx += 1
+        else:
+            fill_record = {attribute: element}
+            fill_record.update(fill_dict)
+            new_data.append(fill_record)
+
+    return new_data

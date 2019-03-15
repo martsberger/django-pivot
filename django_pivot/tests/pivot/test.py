@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from datetime import timedelta, date
 from itertools import chain
 
 from django.conf import settings
@@ -87,6 +88,14 @@ class Tests(TestCase):
             shirt_sale.units = units[indx % len(units)]
             shirt_sale.price = prices[indx % len(prices)]
 
+        shirt_sales.append(ShirtSales(store=Store.objects.first(),
+                                      gender=genders[0],
+                                      style=styles[0],
+                                      shipped='2005-07-05',
+                                      units=13,
+                                      price=73
+                                      ))
+
         ShirtSales.objects.bulk_create(shirt_sales)
 
     def test_pivot(self):
@@ -114,14 +123,14 @@ class Tests(TestCase):
     def test_pivot_on_date(self):
         shirt_sales = ShirtSales.objects.all()
 
-        pt = pivot(ShirtSales, 'style', 'shipped', 'units')
+        pt = pivot(ShirtSales, 'style', 'shipped', 'units', default=0)
 
         for row in pt:
             style = row['style']
             for dt in dates:
                 self.assertEqual(row[dt], sum(ss.units for ss in shirt_sales if ss.style == style and force_text(ss.shipped) == dt))
 
-        pt = pivot(ShirtSales.objects, 'shipped', 'style', 'units')
+        pt = pivot(ShirtSales.objects, 'shipped', 'style', 'units', default=0)
 
         for row in pt:
             shipped = row['shipped']
@@ -131,14 +140,14 @@ class Tests(TestCase):
     def test_pivot_on_foreignkey(self):
         shirt_sales = ShirtSales.objects.all()
 
-        pt = pivot(ShirtSales, 'shipped', 'store__region__name', 'units')
+        pt = pivot(ShirtSales, 'shipped', 'store__region__name', 'units', default=0)
 
         for row in pt:
             shipped = row['shipped']
             for name in ['North', 'South', 'East', 'West']:
                 self.assertEqual(row[name], sum(ss.units for ss in shirt_sales if force_text(ss.shipped) == force_text(shipped) and ss.store.region.name == name))
 
-        pt = pivot(ShirtSales, 'shipped', 'store__name', 'units')
+        pt = pivot(ShirtSales, 'shipped', 'store__name', 'units', default=0)
 
         for row in pt:
             shipped = row['shipped']
@@ -160,14 +169,15 @@ class Tests(TestCase):
             return
 
         shirt_sales = ShirtSales.objects.annotate(**annotations).order_by('date_sort')
-        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units')
+        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units', default=0)
 
         # Get the months and assert that the order by that we sent in is respected
         months = [record['Month'] for record in monthly_report]
-        month_strings = ['12-2004', '01-2005', '02-2005', '03-2005', '04-2005', '05-2005']
+        month_strings = ['12-2004', '01-2005', '02-2005', '03-2005', '04-2005', '05-2005', '07-2005']
         self.assertEqual(months, month_strings)
 
         # Check that the aggregations are correct too
+
         for record in monthly_report:
             month, year = record['Month'].split('-')
             for name in store_names:
@@ -176,11 +186,22 @@ class Tests(TestCase):
                                                                              int(ss.shipped.month) == int(month) and
                                                                              ss.store.name == name)))
 
+    def test_pivot_with_default_fill(self):
+        shirt_sales = ShirtSales.objects.filter(shipped__gt='2005-01-25', shipped__lt='2005-02-03')
+
+        row_range = [date(2005, 1, 25) + timedelta(days=n) for n in range(14)]
+        pt = pivot(shirt_sales, 'shipped', 'style', 'units', default=0, row_range=row_range)
+
+        for row in pt:
+            shipped = row['shipped']
+            for style in styles:
+                self.assertEqual(row[style], sum(ss.units for ss in shirt_sales if force_text(ss.shipped) == force_text(shipped) and ss.style == style))
+
     def test_pivot_aggregate(self):
         shirt_sales = ShirtSales.objects.all()
 
         data = ExpressionWrapper(F('units') * F('price'), output_field=DecimalField())
-        pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg)
+        pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Avg, default=0)
 
         for row in pt:
             region_name = row['store__region__name']
