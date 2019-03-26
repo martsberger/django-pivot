@@ -1,15 +1,18 @@
-.. image:: https://travis-ci.org/martsberger/django-pivot.svg?branch=master
-    :target: https://travis-ci.org/martsberger/django-pivot
-
-.. image:: https://img.shields.io/pypi/dm/django-pivot.svg
-    :target: https://pypistats.org/packages/pypistats
-
 Django Pivot-Tables
 ===================
 
 This package provides utilities for turning Django Querysets into
 `Pivot-Tables <https://en.wikipedia.org/wiki/Pivot_table>`_ and Histograms
 by letting your database do all the heavy lifting.
+
+.. image:: https://travis-ci.org/martsberger/django-pivot.svg?branch=master
+    :target: https://travis-ci.org/martsberger/django-pivot
+
+.. image:: https://codecov.io/gh/martsberger/django-pivot/branch/master/graph/badge.svg
+  :target: https://codecov.io/gh/martsberger/django-pivot
+
+.. image:: https://img.shields.io/pypi/dm/django-pivot.svg
+    :target: https://pypistats.org/packages/pypistats
 
 Examples
 --------
