@@ -40,4 +40,5 @@ install:
   - if [[ "$DB" == "postgres" ]]; then pip install psycopg2; fi
   - pip install -q Django==$DJANGO
 script:
-  - python runtests.py --settings=django_pivot.tests.test_"$DB"_settings
+  - coverage run --omit="*site-packages*","*test*" runtests.py --settings=django_pivot.tests.test_"$DB"_settings
+  - codecov

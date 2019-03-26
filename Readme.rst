@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/martsberger/django-pivot.svg?branch=master
     :target: https://travis-ci.org/martsberger/django-pivot
 
+.. image:: https://img.shields.io/pypi/dm/django-pivot.svg
+    :target: https://pypistats.org/packages/pypistats
+
 Django Pivot-Tables
 ===================
 
