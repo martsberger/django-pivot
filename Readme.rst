@@ -12,7 +12,7 @@ by letting your database do all the heavy lifting.
   :target: https://codecov.io/gh/martsberger/django-pivot
 
 .. image:: https://img.shields.io/pypi/dm/django-pivot.svg
-    :target: https://pypistats.org/packages/pypistats
+    :target: https://pypistats.org/packages/django-pivot
 
 Examples
 --------
