@@ -8,7 +8,7 @@ def read_file(name):
 
 setup(
     name='django-pivot',
-    version='1.8.0',
+    version='1.8.1',
     description='Create pivot tables and histograms from ORM querysets',
     long_description=read_file('Readme.rst'),
     url='https://github.com/martsberger/django-pivot',
