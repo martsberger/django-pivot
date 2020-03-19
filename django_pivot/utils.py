@@ -1,5 +1,8 @@
 from django.core.exceptions import FieldDoesNotExist
-from django.utils.encoding import force_text
+try:
+    from django.utils.encoding import force_str
+except ImportError:
+    from django.utils.encoding import force_text as force_str
 
 
 def get_column_values(queryset, field, choices):
@@ -17,7 +20,7 @@ def get_field_choices(queryset, field):
 
 
 def _database_choices(queryset, field):
-    return [(value, force_text(value)) for value in queryset.values_list(field, flat=True).distinct().order_by(field)]
+    return [(value, force_str(value)) for value in queryset.values_list(field, flat=True).distinct().order_by(field)]
 
 
 def _get_field(model, field_names):
