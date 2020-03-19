@@ -17,6 +17,9 @@ env:
   - DJANGO=2.1.7 DB=sqlite
   - DJANGO=2.1.7 DB=mysql
   - DJANGO=2.1.7 DB=postgres
+  - DJANGO=3.0.4 DB=sqlite
+  - DJANGO=3.0.4 DB=mysql
+  - DJANGO=3.0.4 DB=postgres
 matrix:
   exclude:
     - python: "2.7"
@@ -29,6 +32,12 @@ matrix:
       env: DJANGO=2.1.7 DB=mysql
     - python: "2.7"
       env: DJANGO=2.1.7 DB=postgres
+    - python: "2.7"
+      env: DJANGO=3.0.4 DB=sqlite
+    - python: "2.7"
+      env: DJANGO=3.0.4 DB=mysql
+    - python: "2.7"
+      env: DJANGO=3.0.4 DB=postgres
 
 before_script:
   - mysql -e 'create database pivot;'
@@ -38,7 +47,7 @@ install:
   - pip install coverage
   - pip install codecov
   - if [[ "$DB" == "mysql" && ("$DJANGO" == "1.11.20" || "$DJANGO" == "2.0.13") ]]; then pip install mysqlclient\<=1.3.13; fi
-  - if [[ "$DB" == "mysql" && "$DJANGO" == "2.1.7" ]]; then pip install mysqlclient; fi
+  - if [[ "$DB" == "mysql" && ("$DJANGO" == "2.1.7" || "$DJANGO" == "3.0.4") ]]; then pip install mysqlclient; fi
   - if [[ "$DB" == "postgres" ]]; then pip install psycopg2; fi
   - pip install -q Django==$DJANGO
 script:
