@@ -1,12 +1,14 @@
 from __future__ import absolute_import
 
 from datetime import timedelta, date
+from decimal import Decimal
 from itertools import chain
 
 from django.conf import settings
 from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper
 from django.test import TestCase
 from django.utils.encoding import force_text
+from django import VERSION as django_version
 
 from django_pivot.histogram import histogram
 from django_pivot.pivot import pivot
@@ -208,7 +210,10 @@ class Tests(TestCase):
             for dt in (key for key in row.keys() if key != 'store__region__name'):
                 spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
                 avg = sum(spends) / len(spends) if spends else 0
-                self.assertAlmostEqual(row[dt], float(avg), places=4)
+                if django_version[0] < 3:
+                    self.assertAlmostEqual(row[dt], float(avg), places=4)
+                else:
+                    self.assertAlmostEqual(row[dt], Decimal(avg), places=4)
 
     def test_pivot_display_transform(self):
         def display_transform(string):
