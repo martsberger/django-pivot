@@ -6,7 +6,8 @@ DATABASES = {
         'NAME': 'pivot',
         'USER': 'mysql',
         'PASSWORD': 'mysql',
-        'HOST': 'localhost'
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
