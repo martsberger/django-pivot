@@ -4,7 +4,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'pivot',
-        'USER': 'root',
+        'USER': 'postgres',
         'PASSWORD': 'postgres'
     }
 }
