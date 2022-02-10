@@ -1,4 +1,4 @@
-name: Test
+name: Postgres Test
 
 on:
   push:
@@ -27,10 +27,9 @@ jobs:
         python -m pip install --upgrade pip
         pip install coverage
         pip install codecov
-        pip install mysqlclient
         pip install psycopg2
         pip install -q Django==${{ matrix.django-version }}
     - name: Run Tests
       run: |
-        coverage run --omit="*site-packages*","*test*" runtests.py --settings=django_pivot.tests.test_"$DB"_settings
+        coverage run --omit="*site-packages*","*test*" runtests.py --settings=django_pivot.tests.test_postgres_settings
         codecov
