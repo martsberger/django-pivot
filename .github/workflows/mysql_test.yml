@@ -43,5 +43,5 @@ jobs:
         pip install -q Django==${{ matrix.django-version }}
     - name: Run Tests
       run: |
-        coverage run --omit="*site-packages*","*test*" runtests.py --settings=django_pivot.tests.test_postgres_settings
+        coverage run --omit="*site-packages*","*test*" runtests.py --settings=django_pivot.tests.test_mysql_settings
         codecov
