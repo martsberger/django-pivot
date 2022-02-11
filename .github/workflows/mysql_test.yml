@@ -36,7 +36,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Start MySQL
       run: |
-        sudo service mysql start
+        sudo systemctl enable mysql.service
+        sudo systemctl start mysql.service
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
