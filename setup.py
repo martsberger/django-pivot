@@ -8,20 +8,20 @@ def read_file(name):
 
 setup(
     name='django-pivot',
-    version='1.8.1',
+    version='1.9.0',
     description='Create pivot tables and histograms from ORM querysets',
     long_description=read_file('Readme.rst'),
     url='https://github.com/martsberger/django-pivot',
-    download_url='https://github.com/martsberger/django-pivot/archive/1.8.1.tar.gz',
+    download_url='https://github.com/martsberger/django-pivot/archive/1.9.0.tar.gz',
     author='Brad Martsberger',
     author_email='bmarts@lumere.com',
     license='MIT',
     classifiers=[
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
+        'Programming Language :: Python :: 3.8'
     ],
     packages=find_packages(),
-    install_requires=['django>=1.10']
+    install_requires=['django>=2.2.0']
 )
