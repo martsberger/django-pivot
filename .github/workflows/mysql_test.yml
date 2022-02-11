@@ -23,6 +23,8 @@ jobs:
           MYSQL_PASSWORD: mysql
           MYSQL_USER: mysql
           MYSQL_ROOT_PASSWORD: mysql
+          MYSQL_DATABASE: pivot
+          MYSQL_HOST: 127.0.0.1
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -34,10 +36,6 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Start MySQL
-      run: |
-        sudo systemctl enable mysql.service
-        sudo systemctl start mysql.service
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
