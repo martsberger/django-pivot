@@ -1,7 +1,10 @@
 from django.db.models import Case, When, Q, Count, IntegerField, CharField
 from django.db.models import Value
 from django.shortcuts import _get_queryset
-from django.utils.encoding import force_text
+try:
+    from django.utils.encoding import force_text
+except ImportError:  # Django >= 4.0
+    from django.utils.encoding import force_str as force_text
 
 from django_pivot.utils import get_column_values
 

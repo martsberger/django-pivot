@@ -7,7 +7,10 @@ from itertools import chain
 from django.conf import settings
 from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper
 from django.test import TestCase
-from django.utils.encoding import force_text
+try:
+    from django.utils.encoding import force_text
+except ImportError:  # Django >= 4.0
+    from django.utils.encoding import force_str as force_text
 
 from django_pivot.histogram import histogram
 from django_pivot.pivot import pivot
