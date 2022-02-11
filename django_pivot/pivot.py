@@ -47,7 +47,10 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
 
 def _get_annotations(column, column_values, data, aggregation, display_transform=lambda s: s, default=None):
     value = data if hasattr(data, 'resolve_expression') else F(data)
+    kwargs = dict()
+    if hasattr(data, 'output_field'):
+        kwargs['output_field'] = data.output_field
     return {
-        display_transform(display_value): Coalesce(aggregation(Case(When(Q(**{column: column_value}), then=value))), default)
+        display_transform(display_value): Coalesce(aggregation(Case(When(Q(**{column: column_value}), then=value))), default, **kwargs)
         for column_value, display_value in column_values
     }
