@@ -11,7 +11,6 @@ try:
     from django.utils.encoding import force_text
 except ImportError:  # Django >= 4.0
     from django.utils.encoding import force_str as force_text
-from django import VERSION as django_version
 
 from django_pivot.histogram import histogram
 from django_pivot.pivot import pivot
@@ -213,10 +212,7 @@ class Tests(TestCase):
             for dt in (key for key in row.keys() if key != 'store__region__name'):
                 spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
                 avg = sum(spends) / len(spends) if spends else 0
-                if django_version[0] < 3:
-                    self.assertAlmostEqual(row[dt], float(avg), places=4)
-                else:
-                    self.assertAlmostEqual(row[dt], Decimal(avg), places=4)
+                self.assertAlmostEqual(row[dt], Decimal(avg), places=4)
 
     def test_pivot_display_transform(self):
         def display_transform(string):
@@ -230,6 +226,7 @@ class Tests(TestCase):
             for gender in genders:
                 gender_display = display_transform('Boy' if gender == 'B' else 'Girl')
                 self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
+
 
     def test_pivot_multiple_rows(self):
         shirt_sales = ShirtSales.objects.all()

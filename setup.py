@@ -17,13 +17,11 @@ setup(
     author_email='bmarts@lumere.com',
     license='MIT',
     classifiers=[
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7'
     ],
     packages=find_packages(),
-    install_requires=['django>=1.10', 'six']
+    install_requires=['django>=1.10']
 )

@@ -1,0 +1,37 @@
+name: Sqlite Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
+        django-version: [2.2.27, 3.0.14, 4.0.2]
+        exclude:
+          - python-version: 3.6
+            django-version: 4.0.2
+          - python-version: 3.7
+            django-version: 4.0.2
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install coverage
+        pip install codecov
+        pip install -q Django==${{ matrix.django-version }}
+    - name: Run Tests
+      run: |
+        coverage run --omit="*site-packages*","*test*" runtests.py --settings=django_pivot.tests.test_sqlite_settings
+        codecov

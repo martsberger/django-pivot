@@ -1,4 +1,3 @@
-import six
 from django.db.models import Case, When, Q, F, Sum, CharField, Value
 from django.db.models.functions import Coalesce
 from django.shortcuts import _get_queryset
@@ -22,7 +21,7 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
     :param row_range: iterable with the expected range of rows in the result
     :return: ValuesQueryset
     """
-    values = [rows] if isinstance(rows, six.string_types) else list(rows)
+    values = [rows] if isinstance(rows, str) else list(rows)
 
     queryset = _get_queryset(queryset)
 
