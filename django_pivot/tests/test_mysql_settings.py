@@ -4,7 +4,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'pivot',
-        'USER': 'mysql',
+        'USER': 'root',
         'PASSWORD': 'mysql',
         'HOST': '127.0.0.1',
         'PORT': '3306'
