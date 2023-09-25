@@ -5,7 +5,8 @@ from decimal import Decimal
 from itertools import chain
 
 from django.conf import settings
-from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper
+from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper, Count
+from django.db.models.functions import Trunc
 from django.test import TestCase
 try:
     from django.utils.encoding import force_text
@@ -172,8 +173,9 @@ class Tests(TestCase):
         else:
             return
 
-        shirt_sales = ShirtSales.objects.annotate(**annotations).order_by('date_sort')
-        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units', default=0)
+        shirt_sales = ShirtSales.objects.annotate(**annotations)
+        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units', default=0,
+                               ordering=['date_sort'])
 
         # Get the months and assert that the order by that we sent in is respected
         months = [record['Month'] for record in monthly_report]
@@ -189,6 +191,12 @@ class Tests(TestCase):
                                                    for ss in shirt_sales if (int(ss.shipped.year) == int(year) and
                                                                              int(ss.shipped.month) == int(month) and
                                                                              ss.store.name == name)))
+
+    def test_annotate_non_ordered_field(self):
+        qs = ShirtSales.objects.annotate(period=Trunc('shipped', 'month')).order_by()
+        result = pivot(qs, 'period', 'gender', 'style', Count)
+
+        self.assertEqual(len(result), 7)
 
     def test_pivot_with_default_fill(self):
         shirt_sales = ShirtSales.objects.filter(shipped__gt='2005-01-25', shipped__lt='2005-02-03')

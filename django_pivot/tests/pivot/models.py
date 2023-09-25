@@ -20,3 +20,6 @@ class ShirtSales(models.Model):
     units = models.IntegerField()
     price = models.DecimalField(max_digits=8, decimal_places=2)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ['shipped']

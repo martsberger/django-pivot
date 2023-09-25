@@ -197,7 +197,7 @@ The test suite is run by `Travis <https://travis-ci.org/martsberger/django-pivot
 with Django versions 1.11, 2.0 and 2.1 and backends sqlite, MySQL, and Postgres. If you
 want to run the test suite locally, from the root directory::
 
-    python runtests.py --settings=django_pivot.tests.test_sqlite_settings
+    python runtests.py
 
 That will use sqlite as the backend and whatever version of Django you have
 in your current environment.
