@@ -36,7 +36,14 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
             queryset = queryset.annotate(**{'get_' + row + '_display': row_display})
             values.append('get_' + row + '_display')
 
-    values_list = queryset.values(*values).annotate(**annotations)
+    column_alias_map = {
+        f'CA{n}': annotation_alias for n, annotation_alias in enumerate(annotations.keys())
+    }
+
+    annotations = _swap_dictionary_keys(annotations, column_alias_map, reverse=True)
+
+    values_list = [_swap_dictionary_keys(result, column_alias_map)
+                   for result in queryset.values(*values).annotate(**annotations)]
 
     if row_range:
         attributes = [value[0] for value in column_values]
@@ -53,4 +60,25 @@ def _get_annotations(column, column_values, data, aggregation, display_transform
     return {
         display_transform(display_value): Coalesce(aggregation(Case(When(Q(**{column: column_value}), then=value))), default, **kwargs)
         for column_value, display_value in column_values
+    }
+
+
+def _swap_dictionary_keys(dictionary, key_map, reverse=False):
+    """
+    Change the keys of a dictionary to different keys based on a key map.
+    Preserves key, value pairs for keys not found in key_map.
+    If `reverse` is True, the key_map is used in the opposite direction, keys
+    and values are switched.
+
+    :param dictionary: the input dictionary
+    :param key_map: a mapping from the keys in the input dictionary to a new set of keys
+    :param reverse: Boolean indicating whether the key_map should be reversed
+    :return: A new dictionary with the old keys replaced by the keys in key_map
+    """
+    if reverse:
+        key_map = {v: k for k, v in key_map.items()}
+
+    return {
+        key_map.get(key, key): dictionary[key]
+        for key in dictionary.keys()
     }

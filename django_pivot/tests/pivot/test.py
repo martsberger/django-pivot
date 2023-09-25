@@ -29,9 +29,9 @@ dates = ['2004-12-24',
 store_names = [
     'ABC Shirts',
     'Shirt Emporium',
-    'Just Shirts',
-    'Shirts R Us',
-    'Shirts N More'
+    'Just Shirts;',
+    'Shirts --R Us',
+    'Shirts N "More"'
 ]
 
 
@@ -70,11 +70,11 @@ class Tests(TestCase):
 
         regions = list(Region.objects.all())
 
-        Store(name='ABC Shirts', region=regions[0]).save()
-        Store(name='Shirt Emporium', region=regions[1]).save()
-        Store(name='Just Shirts', region=regions[2]).save()
-        Store(name='Shirts R Us', region=regions[3]).save()
-        Store(name='Shirts N More', region=regions[0]).save()
+        Store(name=store_names[0], region=regions[0]).save()
+        Store(name=store_names[1], region=regions[1]).save()
+        Store(name=store_names[2], region=regions[2]).save()
+        Store(name=store_names[3], region=regions[3]).save()
+        Store(name=store_names[4], region=regions[0]).save()
 
         units = [12, 9, 10, 15, 13, 9, 15, 3, 7]
         prices = [11.04, 13.00, 11.96, 11.27, 12.12, 13.74, 11.44, 12.63, 12.06, 13.42, 11.48]
