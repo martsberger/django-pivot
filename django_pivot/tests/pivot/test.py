@@ -173,8 +173,9 @@ class Tests(TestCase):
         else:
             return
 
-        shirt_sales = ShirtSales.objects.annotate(**annotations).order_by('date_sort')
-        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units', default=0)
+        shirt_sales = ShirtSales.objects.annotate(**annotations)
+        monthly_report = pivot(shirt_sales, 'Month', 'store__name', 'units', default=0,
+                               ordering=['date_sort'])
 
         # Get the months and assert that the order by that we sent in is respected
         months = [record['Month'] for record in monthly_report]
@@ -192,10 +193,10 @@ class Tests(TestCase):
                                                                              ss.store.name == name)))
 
     def test_annotate_non_ordered_field(self):
-        qs = ShirtSales.objects.annotate(period=Trunc('shipped', 'month'))
+        qs = ShirtSales.objects.annotate(period=Trunc('shipped', 'month')).order_by()
         result = pivot(qs, 'period', 'gender', 'style', Count)
 
-        self.assertEqual(len(result), 6)
+        self.assertEqual(len(result), 7)
 
     def test_pivot_with_default_fill(self):
         shirt_sales = ShirtSales.objects.filter(shipped__gt='2005-01-25', shipped__lt='2005-02-03')

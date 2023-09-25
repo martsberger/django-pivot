@@ -5,7 +5,8 @@ from django.shortcuts import _get_queryset
 from django_pivot.utils import get_column_values, get_field_choices, default_fill
 
 
-def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display_transform=lambda s: s, default=None, row_range=()):
+def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display_transform=lambda s: s,
+          default=None, row_range=(), ordering=()):
     """
     Takes a queryset and pivots it. The result is a table with one record
     per unique value in the `row` column, a column for each unique value in the `column` column
@@ -16,14 +17,16 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
     :param column: string, name of column that will define columns
     :param data: column name or Combinable
     :param aggregation: aggregation function to apply to data column
-    :param display_transform: function that takes a string and returns a string
+    :param choices: specify 'minimum' if you want to do an extra database query to get only choices present in the data
+    :param display_transform: function that takes an object and returns a string
     :param default: default value to pass to the aggregate function when no record is found
     :param row_range: iterable with the expected range of rows in the result
+    :param ordering: option to specify how the resulting pivot should be ordered
     :return: ValuesQueryset
     """
     values = [rows] if isinstance(rows, str) else list(rows)
 
-    queryset = _get_queryset(queryset).order_by()
+    queryset = _get_queryset(queryset).order_by(*ordering)
 
     column_values = get_column_values(queryset, column, choices)
 
