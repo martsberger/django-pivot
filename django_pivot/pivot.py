@@ -23,7 +23,7 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
     """
     values = [rows] if isinstance(rows, str) else list(rows)
 
-    queryset = _get_queryset(queryset)
+    queryset = _get_queryset(queryset).order_by()
 
     column_values = get_column_values(queryset, column, choices)
 
