@@ -4,16 +4,10 @@ from django.db import models
 class Region(models.Model):
     name = models.CharField(max_length=7)
 
-    def __unicode__(self):
-        return self.name
-
 
 class Store(models.Model):
     name = models.CharField(max_length=20)
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
-
-    def __unicode__(self):
-        return self.name
 
 
 class ShirtSales(models.Model):

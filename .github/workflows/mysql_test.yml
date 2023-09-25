@@ -12,13 +12,17 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: [3.6, 3.7, 3.8]
-        django-version: [2.2.27, 3.0.14, 4.0.2]
+        python-version: [3.8, 3.9, 3.10.13, 3.11]
+        django-version: [3.2.21, 4.1.11, 4.2.5]
         exclude:
-          - python-version: 3.6
-            django-version: 4.0.2
-          - python-version: 3.7
-            django-version: 4.0.2
+          - python-version: 3.8
+            django-version: 4.1.11
+          - python-version: 3.8
+            django-version: 4.2.5
+          - python-version: 3.11
+            django-version: 3.2.21
+          - python-version: 3.11
+            django-version: 4.1.11
     services:
       mysql:
         image: mysql
