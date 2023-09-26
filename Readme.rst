@@ -89,6 +89,11 @@ the average number of units per order. Then we can pass the Avg aggregation func
 >>> from django.db.models import Avg
 >>> pivot_table = pivot(ShirtSales, 'region', 'shipped', 'units', aggregation=Avg)
 
+The pivot function can optionally include a *Total* column, containing all the data
+aggregated to a single column:
+
+>>> pivot_table = pivot(ShirtSales.objects.filter(style='Golf'), 'region', 'shipped', 'units', include_total=True)
+
 If your data is stored across multiple tables, use Django's double underscore notation
 to traverse foreign key relationships. For example, instead of the ShirtSales model having
 a *region* attribute, it might have a foreign key to a Store model, which in turn has a
