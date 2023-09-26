@@ -3,9 +3,10 @@ from __future__ import absolute_import
 from datetime import timedelta, date
 from decimal import Decimal
 from itertools import chain
+from statistics import mean
 
 from django.conf import settings
-from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper, Count
+from django.db.models import CharField, Func, F, Avg, DecimalField, ExpressionWrapper, Count, Sum
 from django.db.models.functions import Trunc
 from django.test import TestCase
 try:
@@ -114,6 +115,25 @@ class Tests(TestCase):
                 gender_display = 'Boy' if gender == 'B' else 'Girl'
                 self.assertEqual(row[gender_display], sum(ss.units for ss in shirt_sales if ss.style == style and ss.gender == gender))
 
+    def test_total_column_sum(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units', include_total=True)
+
+        for row in pt:
+            style = row['style']
+            self.assertEqual(row['Total'], sum(ss.units for ss in shirt_sales if ss.style == style))
+
+    def test_total_column_avg(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        pt = pivot(ShirtSales.objects.all(), 'style', 'gender', 'units',
+                   include_total=True, aggregation=Avg)
+
+        for row in pt:
+            style = row['style']
+            self.assertEqual(row['Total'], mean(ss.units for ss in shirt_sales if ss.style == style))
+
     def test_pivot_on_choice_field_row(self):
         shirt_sales = ShirtSales.objects.all()
 
@@ -221,6 +241,17 @@ class Tests(TestCase):
                 spends = [ss.units * ss.price for ss in shirt_sales if force_text(ss.shipped) == force_text(dt) and ss.store.region.name == region_name]
                 avg = sum(spends) / len(spends) if spends else 0
                 self.assertAlmostEqual(row[dt], Decimal(avg), places=4)
+
+    def test_pivot_aggregate_total_column(self):
+        shirt_sales = ShirtSales.objects.all()
+
+        data = ExpressionWrapper(F('units') * F('price'), output_field=DecimalField())
+        pt = pivot(ShirtSales, 'store__region__name', 'shipped', data, Sum, default=0, include_total=True)
+
+        for row in pt:
+            region_name = row['store__region__name']
+            total_spend = sum(ss.units * ss.price for ss in shirt_sales if ss.store.region.name == region_name)
+            self.assertAlmostEqual(total_spend, row['Total'], places=4)
 
     def test_pivot_display_transform(self):
         def display_transform(string):
