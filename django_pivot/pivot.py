@@ -6,7 +6,7 @@ from django_pivot.utils import get_column_values, get_field_choices, default_fil
 
 
 def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display_transform=lambda s: s,
-          default=None, row_range=(), ordering=()):
+          default=None, row_range=(), ordering=(), include_total=False):
     """
     Takes a queryset and pivots it. The result is a table with one record
     per unique value in the `row` column, a column for each unique value in the `column` column
@@ -22,6 +22,7 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
     :param default: default value to pass to the aggregate function when no record is found
     :param row_range: iterable with the expected range of rows in the result
     :param ordering: option to specify how the resulting pivot should be ordered
+    :param include_total: Boolean, default False, add an additional column containing the Total of the aggregation
     :return: ValuesQueryset
     """
     values = [rows] if isinstance(rows, str) else list(rows)
@@ -30,11 +31,13 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
 
     column_values = get_column_values(queryset, column, choices)
 
-    annotations = _get_annotations(column, column_values, data, aggregation, display_transform, default=default)
+    annotations = _get_annotations(column, column_values, data, aggregation, display_transform,
+                                   default=default, include_total=include_total)
     for row in values:
         row_choices = get_field_choices(queryset, row)
         if row_choices:
-            whens = (When(Q(**{row: value}), then=Value(display_value, output_field=CharField())) for value, display_value in row_choices)
+            whens = (When(Q(**{row: value}), then=Value(display_value, output_field=CharField()))
+                     for value, display_value in row_choices)
             row_display = Case(*whens)
             queryset = queryset.annotate(**{'get_' + row + '_display': row_display})
             values.append('get_' + row + '_display')
@@ -55,15 +58,20 @@ def pivot(queryset, rows, column, data, aggregation=Sum, choices='auto', display
     return values_list
 
 
-def _get_annotations(column, column_values, data, aggregation, display_transform=lambda s: s, default=None):
+def _get_annotations(column, column_values, data, aggregation, display_transform=lambda s: s,
+                     default=None, include_total=False):
     value = data if hasattr(data, 'resolve_expression') else F(data)
     kwargs = dict()
     if hasattr(data, 'output_field'):
         kwargs['output_field'] = data.output_field
-    return {
+    annotations = {
         display_transform(display_value): Coalesce(aggregation(Case(When(Q(**{column: column_value}), then=value))), default, **kwargs)
         for column_value, display_value in column_values
     }
+    if include_total:
+        annotations['Total'] = Coalesce(aggregation(value), default, **kwargs)
+
+    return annotations
 
 
 def _swap_dictionary_keys(dictionary, key_map, reverse=False):
