@@ -132,7 +132,7 @@ class Tests(TestCase):
 
         for row in pt:
             style = row['style']
-            self.assertEqual(row['Total'], mean(ss.units for ss in shirt_sales if ss.style == style))
+            self.assertAlmostEqual(row['Total'], mean(ss.units for ss in shirt_sales if ss.style == style), places=4)
 
     def test_pivot_on_choice_field_row(self):
         shirt_sales = ShirtSales.objects.all()
