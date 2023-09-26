@@ -5,9 +5,6 @@ This package provides utilities for turning Django Querysets into
 `Pivot-Tables <https://en.wikipedia.org/wiki/Pivot_table>`_ and Histograms
 by letting your database do all the heavy lifting.
 
-.. image:: https://travis-ci.org/martsberger/django-pivot.svg?branch=master
-    :target: https://travis-ci.org/martsberger/django-pivot
-
 .. image:: https://codecov.io/gh/martsberger/django-pivot/branch/master/graph/badge.svg
   :target: https://codecov.io/gh/martsberger/django-pivot
 
@@ -64,7 +61,7 @@ to make a pivot table like the example above:
 
 >>> pivot_table = pivot(ShirtSales, 'shipped', 'region', 'units')
 
-The result is a ValuesQuerySet, which means the objects returned are dictionaries. Each
+The result is a list of dictionaries. Each
 dictionary has a key for the row ('shipped' dates in this case) and a key for every value
 of the column ('region' in this case).
 
@@ -115,13 +112,19 @@ and gender, you can pass a list to the first argument:
 >>> pivot_table = pivot(ShirtSales, ['region', 'gender'], 'shipped', 'units')
 
 To change the way the row keys are displayed, a display_transform function can be passed to
-the pivot function. display_transform is a function that takes a string and returns a string.
+the pivot function. display_transform is a function that takes an object and returns a string.
 For example, instead of getting the results with North, East, South, and West for the regions
 you want them all lower cased, you can do the following
 
 >>> def lowercase(s):
 >>>     return s.lower()
 >>> pivot_table = pivot(ShirtSales, 'region', 'shipped', 'units', display_transform=lowercase)
+
+The display_transform option is also useful if your column attribute is not a hashable type. Since it
+will be used as a key in a dictionary, you need to do something to make it hashable, for
+example converting it to its string representation:
+
+>>> pivot_table = pivot(ShirtSales, 'region', 'shipped', 'units', display_transform=str)
 
 If there are no records in the original data table for a particular cell in the pivot result,
 SQL will return NULL and this gets translated to None in python. If you want to get zero, or
@@ -182,7 +185,7 @@ Just::
 
     pip install django-pivot
 
-put django_pivot in installed apps in your settings file, and then you::
+and then you::
 
     from django_pivot.pivot import pivot
     from django_pivot.histogram import histogram
@@ -193,8 +196,8 @@ And off you go.
 Tests
 -----
 
-The test suite is run by `Travis <https://travis-ci.org/martsberger/django-pivot>`_
-with Django versions 1.11, 2.0 and 2.1 and backends sqlite, MySQL, and Postgres. If you
+The test suite is run by via Github actions for pushes to master and pull requests to master
+with Django versions 3.2.21, 4.1.11, and 4.2.5 and backends sqlite, MySQL, and Postgres. If you
 want to run the test suite locally, from the root directory::
 
     python runtests.py
@@ -207,7 +210,7 @@ License
 
 MIT
 
-Copyright 2017 Brad Martsberger
+Copyright 2017 - 2023 Brad Martsberger
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
