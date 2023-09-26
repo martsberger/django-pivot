@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-pivot"
+version = "1.10.0"
+authors = [
+  { name="Brad Martsberger", email="bradley.marts@gmail.com" },
+]
+description = "Create pivot tables and histograms from ORM querysets"
+readme = "Readme.rst"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "django>=3.2"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/martsberger/django-pivot"
+"Download" = "https://github.com/martsberger/django-pivot/archive/1.10.0.tar.gz"
